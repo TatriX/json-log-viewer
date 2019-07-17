@@ -21,7 +21,7 @@ enum Level {
     Trace,
     Debug,
     Info,
-    Warn,
+    Warning,
     Error,
 }
 
@@ -31,7 +31,7 @@ impl fmt::Display for Level {
             Level::Trace => "white".cyan(),
             Level::Debug => "white".cyan(),
             Level::Info => "info".white(),
-            Level::Warn => "warn".purple(),
+            Level::Warning => "warn".purple(),
             Level::Error => "error".red(),
         })
     }
