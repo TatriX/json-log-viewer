@@ -40,16 +40,23 @@ impl fmt::Display for Level {
 
 fn main() -> io::Result<()> {
     for line in  io::stdin().lock().lines().map(|l| l.unwrap()) {
-        let message: Message = serde_json::from_str(&line).expect("Cannot decode");
-        print!(" {} ┊{}┊ ", message.level, message.time.format("%H:%M:%S"));
-        match message.msg {
-            Value::String(s) => print!("{}", s),
-            other => print!("{}", other),
+        match serde_json::from_str::<Message>(&line) {
+            Ok(message) => {
+                print!(" {} ┊{}┊ ", message.level, message.time.format("%H:%M:%S"));
+                match message.msg {
+                    Value::String(s) => print!("{}", s),
+                    other => print!("{}", other),
+                }
+                message.extra.iter().for_each(|(key, value)| {
+                    print!(" {}: {}", key.white(), value);
+                });
+                println!();
+            },
+            Err(_) => {
+                // if we can't parse json, just print line back
+                println!("{}", line);
+            }
         }
-        message.extra.iter().for_each(|(key, value)| {
-            print!(" {}: {}", key.white(), value);
-        });
-        println!();
     }
     Ok(())
 }
