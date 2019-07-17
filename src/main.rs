@@ -1,4 +1,5 @@
 use std::io::{self, BufRead};
+use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::Value;
 use colored::*;
@@ -10,6 +11,8 @@ struct Message {
     level: Level,
     msg: Value,
     time: DateTime<Utc>,
+    #[serde(flatten)]
+    extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,9 +43,13 @@ fn main() -> io::Result<()> {
         let message: Message = serde_json::from_str(&line).expect("Cannot decode");
         print!(" {} ┊{}┊ ", message.level, message.time.format("%H:%M:%S"));
         match message.msg {
-            Value::String(s) => println!("{}", s),
-            other => println!("{}", other),
+            Value::String(s) => print!("{}", s),
+            other => print!("{}", other),
         }
+        message.extra.iter().for_each(|(key, value)| {
+            print!(" {}: {}", key.white(), value);
+        });
+        println!();
     }
     Ok(())
 }
